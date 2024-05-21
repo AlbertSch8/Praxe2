@@ -15,8 +15,8 @@ public class ConvertCoordinates {
 
             String line;
             while ((line = reader.readLine()) != null) {
-                // Find coordinates using regex
-                String convertedLine = convertLineCoordinates(line);
+                // Process the line and convert the coordinates
+                String convertedLine = processLine(line);
 
                 // Write the updated line to the output file
                 writer.write(convertedLine + "\n");
@@ -28,15 +28,26 @@ public class ConvertCoordinates {
         }
     }
 
-    private static String convertLineCoordinates(String line) {
+    static String processLine(String line) {
+        String[] columns = line.split(",");
+
+        if (columns.length >= 7) {
+            // Check if the seventh column contains coordinates in DMS format
+            columns[6] = convertLineCoordinates(columns[6]);
+        }
+
+        return String.join(",", columns);
+    }
+
+    static String convertLineCoordinates(String coordinate) {
         // Regex pattern for finding coordinates in the format of DMS
-        String regexPattern = "\\b(\\d+)[°](\\d+)['](\\d+)[\"]([NS])\\s*(\\d+)[°](\\d+)['](\\d+)[\"]([EW])\\b";
+        String regexPattern = "(\\d+)[°](\\d+)'(\\d+\\.?\\d*)\"([NS])\\s*(\\d+)[°](\\d+)'(\\d+\\.?\\d*)\"([EW])";
 
         // Compile the pattern
         Pattern pattern = Pattern.compile(regexPattern);
-        Matcher matcher = pattern.matcher(line);
+        Matcher matcher = pattern.matcher(coordinate);
 
-        // Check if coordinates are found in the line
+        // Check if coordinates are found in the string
         if (matcher.find()) {
             // Extract coordinates from matcher groups
             double latitudeDegrees = Double.parseDouble(matcher.group(1));
@@ -52,7 +63,7 @@ public class ConvertCoordinates {
             double latitude = latitudeDegrees + latitudeMinutes / 60 + latitudeSeconds / 3600;
             double longitude = longitudeDegrees + longitudeMinutes / 60 + longitudeSeconds / 3600;
 
-            // Check direction and adjust latitude and longitude accordingly
+            // Adjust latitude and longitude based on direction
             if (latitudeDirection.equals("S")) {
                 latitude = -latitude;
             }
@@ -60,13 +71,23 @@ public class ConvertCoordinates {
                 longitude = -longitude;
             }
 
+            // Further divide by 60
+            latitude /= 60;
+            longitude /= 60;
+
             // Format the coordinates in decimal degrees
-            String formattedCoordinates = String.format("%.6f, %.6f", latitude, longitude);
-            // Replace DMS coordinates with DD coordinates in the line
-            return line.replaceFirst(regexPattern, formattedCoordinates);
+            String formattedLatitude = formatCoordinate(latitude);
+            String formattedLongitude = formatCoordinate(longitude);
+
+            return formattedLatitude + ", " + formattedLongitude;
         } else {
-            // If coordinates are not found, return the original line
-            return line;
+            // If coordinates are not found, return the original string
+            return coordinate;
         }
+    }
+
+    private static String formatCoordinate(double coordinate) {
+        // Format the coordinate to have 6 decimal places
+        return String.format("%.2f", coordinate);
     }
 }
