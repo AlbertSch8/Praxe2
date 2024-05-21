@@ -5,8 +5,8 @@ import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) {
-        String inputFile = "C:\\Users\\Albert\\Desktop\\Praxe3.csv";
-        String outputFile = "C:\\Users\\Albert\\Desktop\\Praxe3_converted.csv";
+        String inputFile = "./aktivace_dm_jaro_2024_original.csv";
+        String outputFile = "./aktivace_dm_jaro_2024_converted.csv";
 
         try (BufferedReader reader = new BufferedReader(new FileReader(inputFile));
              FileWriter writer = new FileWriter(outputFile)) {
@@ -27,17 +27,16 @@ public class Main {
     }
 
     private static String processLine(String line) {
-        String[] columns = line.split(",");
+        String[] columns = line.split(";");
 
-        if (columns.length >= 2) {
+        if (columns.length > 6) {
             // Check if the seventh column contains coordinates in DMS format
             System.out.println("Original line: " + line);
-            columns[0] = ConvertCoordinates.convertLineCoordinates(columns[0]);
-            columns[1] = ConvertCoordinates.convertLineCoordinates(columns[1]);
-            System.out.println("Converted line: " + String.join(",", columns));
+            columns[6] = ConvertCoordinates.convertLineCoordinates(columns[6]);
+            System.out.println("Converted line: " + String.join(";", columns));
         }
 
-        return String.join(",", columns);
+        return String.join(";", columns);
     }
 
 

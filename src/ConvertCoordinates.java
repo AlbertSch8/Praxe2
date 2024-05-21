@@ -41,7 +41,7 @@ public class ConvertCoordinates {
 
     static String convertLineCoordinates(String coordinate) {
         // Regex pattern for finding coordinates in the format of DMS
-        String regexPattern = "(\\d+)[°](\\d+)'(\\d+\\.?\\d*)\"([NS])\\s*(\\d+)[°](\\d+)'(\\d+\\.?\\d*)\"([EW])";
+        String regexPattern = "\"(\\d+)°(\\d+)'(\\d+.?\\d*)\"\"([NS])\\s(\\d+)°(\\d+)'(\\d+.?\\d*)\"\"([WE])";
 
         // Compile the pattern
         Pattern pattern = Pattern.compile(regexPattern);
@@ -72,8 +72,8 @@ public class ConvertCoordinates {
             }
 
             // Further divide by 60
-            latitude /= 60;
-            longitude /= 60;
+            //latitude /= 60;
+            //longitude /= 60;
 
             // Format the coordinates in decimal degrees
             String formattedLatitude = formatCoordinate(latitude);
@@ -88,6 +88,6 @@ public class ConvertCoordinates {
 
     private static String formatCoordinate(double coordinate) {
         // Format the coordinate to have 6 decimal places
-        return String.format("%.2f", coordinate);
+        return String.format("%.6f", coordinate);
     }
 }
